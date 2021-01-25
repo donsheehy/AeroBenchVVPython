@@ -15,6 +15,8 @@ from aerobench.visualize import plot
 
 from aerobench.examples.gcas.gcas_autopilot import GcasAutopilot
 
+import pickle
+
 class InitialConditions:
     def __init__(self,
                  power,
@@ -80,19 +82,20 @@ def main():
     # Yaw angle from North (rad)
     #
 
-    init = InitialConditions(power = 9,
-                             velocity = 540,
-                             altitude = 1000,
-                             trim_aoa = deg2rad(2.1215),
-                             side_slip_angle = 0,
-                             roll = -math.pi/8,
-                             pitch = (-math.pi/2)*0.3,
-                             yaw = 0)
-    tmax = 3.51 # simulation time
+    for i in range(10):
+        init = InitialConditions(power = 9,
+                                 velocity = 540,
+                                 altitude = 500 + 100 * i,
+                                 trim_aoa = deg2rad(2.1215),
+                                 side_slip_angle = 0,
+                                 roll = -math.pi/8,
+                                 pitch = (-math.pi/2)*0.3,
+                                 yaw = 0)
+        tmax = 3.51 # simulation time
 
-    ap = GcasAutopilot(init_mode='roll', stdout=True, gain_str='old')
-
-    res = run_f16_sim(init.aslist(), tmax, ap, extended_states=True)
+        ap = GcasAutopilot(init_mode='roll', stdout=True, gain_str='old')
+        res = run_f16_sim(init.aslist(), tmax, ap, extended_states=True)
+        pickle.dump(res, open('simulation' + str(i) + '.p', 'wb'))
 
     print(f"Simulation Completed in {round(res['runtime'], 3)} seconds")
 
